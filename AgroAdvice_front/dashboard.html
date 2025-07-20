@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroAdvice - Dashboard</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/src/output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+
+
+</head>
+<body>
+    <header class="header">
+        <div class="logo-title">
+            <h1>AgroAdvice</h1>
+        </div>
+    
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i> <!-- Icône utilisateur FontAwesome -->
+            </div>
+        
+            <div class="user-details">
+                <h2 id="userName">User Name</h2>
+                <p id="userEmail">email@example.com</p>
+                <div class="status">
+                    <span class="status-dot"></span>
+                    <span>Connecté</span>
+                </div>
+            </div>
+            
+            <button class="logout-btn" onclick="logout()">⏻</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="welcome">
+            <h1>Bonjour <span id="userName2">userName</span> ! 👋</h1>
+            <p>Posez-moi vos questions agricoles et recevez des conseils personnalisés pour optimiser vos pratiques.</p>
+        </div>
+
+        <div class="cards-container">
+            <div class="card conseil" onclick="selectCard('conseil')">
+                <div class="card-icon">💡</div>
+                <div class="card-content">
+                    <h3>Conseil du jour</h3>
+                    <p>Vérifiez l'humidité du sol avant d'arroser</p>
+                </div>
+            </div>
+
+            <!-- <div class="card tendance" onclick="selectCard('tendance')">
+                <div class="card-icon">📊</div>
+                <div class="card-content">
+                    <h3>Tendance</h3>
+                    <p>Agriculture de précision en hausse</p>
+                </div>
+            </div>
+
+            <div class="card eco" onclick="selectCard('eco')">
+                <div class="card-icon">🌱</div>
+                <div class="card-content">
+                    <h3>Éco-conseil</h3>
+                    <p>Favorisez la biodiversité avec des haies</p>
+                </div>
+            </div> -->
+        </div>
+
+        <div class="question-section">
+            <div class="question-header">
+                <span>💬</span>
+                <h3>Posez votre question</h3>
+            </div>
+
+            <div id="conversationContainer" class="conversation-container"></div>
+
+            <form id="questionForm">
+                <textarea 
+                    id="questionText" 
+                    class="question-textarea" 
+                    placeholder="Exemple: Comment améliorer la fertilité de mon sol argilo-calcaire ?"
+                    required
+                ></textarea>                             
+                
+                <div class="bouttons">
+                    <button type="submit" class="submit-btn "><i class="fas fa-paper-plane"></i></button>
+                    <button type="button" class="submit-btn id="btnStartSpeech" title="Dicter votre question">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+                <!-- <button type="submit" class="submit-btn">Obtenir des conseils</button> -->
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+        
+            if (!token) {
+                // Aucun token, redirection vers login
+                window.location.href = '/login.html';
+                return;
+            }
+        
+            fetch('http://localhost:3000/api/auth/verify', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('userName').innerText = data.userFullName;
+                    document.getElementById('userEmail').innerText = data.userEmail;
+                    document.getElementById('userName2').innerText = data.userFullName;
+                } else {
+                    // Token invalide ou expiré
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                }
+            })
+            .catch(err => {
+                console.error('Erreur lors de la vérification du token', err);
+                window.location.href = '/login.html';
+            });
+        });
+
+        //Deconnexion
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/index.html';
+        }
+
+
+        function selectCard(cardType) {
+            const textarea = document.getElementById('questionText');
+            
+            switch(cardType) {
+                case 'conseil':
+                    textarea.value = "Pouvez-vous me donner plus de détails sur comment vérifier l'humidité du sol avant d'arroser ?";
+                    break;
+                case 'tendance':
+                    textarea.value = "Comment puis-je intégrer l'agriculture de précision dans mon exploitation ?";
+                    break;
+                case 'eco':
+                    textarea.value = "Quels types de haies sont les plus efficaces pour favoriser la biodiversité ?";
+                    break;
+            }
+            
+            textarea.focus();
+            
+            // Add visual feedback
+            document.querySelectorAll('.card').forEach(card => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            });
+            
+            event.currentTarget.style.transform = 'translateY(-4px)';
+            event.currentTarget.style.boxShadow = '0 6px 25px rgba(0, 0, 0, 0.2)';
+        }
+
+        function formatText(command) {
+            const textarea = document.getElementById('questionText');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            
+            let formattedText = selectedText;
+            
+            switch(command) {
+                case 'bold':
+                    formattedText = `**${selectedText}**`;
+                    break;
+                case 'italic':
+                    formattedText = `*${selectedText}*`;
+                    break;
+                case 'underline':
+                    formattedText = `__${selectedText}__`;
+                    break;
+            }
+            
+            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            textarea.focus();
+        }
+
+
+
+        function insertTextAtCursor(text) {
+            const textarea = document.getElementById('questionText');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            
+            textarea.value = textarea.value.substring(0, start) + text + textarea.value.substring(end);
+            textarea.focus();
+            textarea.setSelectionRange(start + text.length, start + text.length);
+        }
+
+        //Gestion de la conversation
+        document.getElementById('questionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+        
+            const question = document.getElementById('questionText').value.trim();
+            const token = localStorage.getItem('token');
+            const conversationContainer = document.getElementById('conversationContainer');
+        
+            if (!question || !token) return;
+        
+            // Afficher la question de l'utilisateur
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('message', 'user');
+            userMessage.innerHTML = `
+                <div class="message-content">${question}</div>
+            `;
+            conversationContainer.appendChild(userMessage);
+        
+            // Effacer le champ texte
+            document.getElementById('questionText').value = '';
+            conversationContainer.scrollTop = conversationContainer.scrollHeight;
+        
+            try {
+                const res = await fetch('http://localhost:3000/api/bot/userPrompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ question })
+                });
+            
+                const data = await res.json();
+            
+                // Afficher la réponse du bot
+                const botMessage = document.createElement('div');
+                botMessage.classList.add('message', 'bot');
+            
+                const markdown = data.success 
+                    ? marked.parse(data.reply) 
+                    : `<span style="color: red;">Erreur : ${data.message}</span>`;
+            
+                botMessage.innerHTML = `
+                    <div class="avatar bot-avatar"></div>
+                    <div class="message-content">
+                        ${markdown}
+                        <p style="border:none; cursor: pointer; color:#4caf50;" class="speak-button">
+                            <i class="fas fa-play"></i> cliquez pour écouter
+                        </p>
+                    </div>
+                `;
+            
+                conversationContainer.appendChild(botMessage);
+                function parler(texte) {
+                    if (!texte) return;
+                    const synth = window.speechSynthesis;
+                    const utterance = new SpeechSynthesisUtterance(texte);
+                    utterance.lang = 'fr-FR';  // définir la langue française
+                    synth.speak(utterance);
+                }
+                
+                const speakBtn = botMessage.querySelector('.speak-button');
+                if (speakBtn) {
+                    speakBtn.addEventListener('click', () => {
+                        const tmp = document.createElement('div');
+                        tmp.innerHTML = data.reply; // markdown converti en HTML
+                        const cleanText = tmp.textContent || tmp.innerText || "";
+                        parler(cleanText);
+                    });
+                }
+
+            } catch (error) {
+                const botMessage = document.createElement('div');
+                botMessage.classList.add('message', 'bot');
+                botMessage.innerHTML = `
+                    <div class="avatar bot-avatar"></div>
+                    <div class="message-content" style="color: red;">Erreur réseau : ${error.message}</div>
+                `;
+                conversationContainer.appendChild(botMessage);
+            }
+        });
+
+        let recognition;
+        let isListening = false;
+
+        // Vérifie si l'API SpeechRecognition est supportée
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Votre navigateur ne supporte pas la reconnaissance vocale.");
+                return null;
+            }
+            return new SpeechRecognition();
+        }
+
+        function startSpeechToText() {
+            recognition = initSpeechRecognition();
+            if (!recognition) return;
+        
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'fr-FR';
+        
+            recognition.onstart = () => {
+                isListening = true;
+                console.log("Démarrage de l'écoute vocale...");
+                // Optionnel : changer l'apparence du bouton micro ici
+                document.getElementById('btnStartSpeech').style.color = 'red';
+            };
+        
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                console.log("Texte reconnu :", transcript);
+            
+                // Injecter le texte reconnu dans la zone textarea
+                const textarea = document.getElementById('questionText');
+                textarea.value = transcript;
+                textarea.focus();
+            };
+        
+            recognition.onerror = (event) => {
+                console.error("Erreur reconnaissance vocale:", event.error);
+                alert("Erreur de reconnaissance vocale : " + event.error);
+            };
+        
+            recognition.onend = () => {
+                isListening = false;
+                console.log("Fin de l'écoute.");
+                // Remettre le style normal du bouton
+                document.getElementById('btnStartSpeech').style.color = '';
+            };
+        
+            recognition.start();
+        }
+
+        // Associer l'écoute au clic du bouton micro
+        document.getElementById('btnStartSpeech').addEventListener('click', () => {
+            if (isListening) {
+                recognition.stop(); // arrêter si déjà en écoute
+            } else {
+                startSpeechToText();
+            }
+        });
+
+
+        //Reponse audio
+        // async function jouerSyntheseVocale(texte) {
+        //     const token = localStorage.getItem('token');
+        //     try {
+        //         const res = await fetch('http://localhost:3000/api/voice/speak', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //                 'Authorization': `Bearer ${token}`
+        //             },
+        //             body: JSON.stringify({ text: texte })
+        //         });
+            
+        //         if (!res.ok) throw new Error("Erreur serveur TTS");
+            
+        //         const audioBlob = await res.blob();
+        //         const audioUrl = URL.createObjectURL(audioBlob);
+        //         const audio = new Audio(audioUrl);
+        //         audio.play();
+        //     } catch (error) {
+        //         console.error("Erreur de synthèse vocale:", error);
+        //     }
+        // }
+    </script>
+</body>
+</html>

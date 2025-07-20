@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroAdvice - Inscription</title>
+    <link rel="stylesheet" href="/css/signup.css">
+</head>
+<body>
+    <div class="signup-container">
+        <h1 class="logo">AgroAdvice</h1>
+        <p class="subtitle">Créez votre compte pour accédez à votre assistant agricole intelligent</p>
+        
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="fullName">Nom complet <span class="required">*</span></label>
+                <input type="text" id="fullName" name="fullName" placeholder="Ex : Jean Koffi">
+                <div class="error-message" id="fullNameError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Adresse e-mail <span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="exemple@gmail.com">
+                <div class="error-message" id="emailError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe <span class="required">*</span></label>
+                <div class="input-container">
+                    <input type="password" id="password" name="password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')">👁</button>
+                </div>
+                <div class="error-message" id="passwordError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirmer le mot de passe <span class="required">*</span></label>
+                <div class="input-container">
+                    <input type="password" id="confirmPassword" name="confirmPassword">
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁</button>
+                </div>
+                <div class="error-message" id="confirmPasswordError"></div>
+            </div>
+            
+            <button type="submit" class="signup-btn">Créer mon compte</button>
+        </form>
+        
+        <p class="login-link">
+            Déjà un compte ? <a href="login.html">Se connecter</a>
+        </p>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggleBtn = passwordInput.nextElementSibling;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁';
+            }
+        }
+
+        
+
+        function validateForm() {
+            let isValid = true;
+            
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(msg => {
+                msg.style.display = 'none';
+                msg.textContent = '';
+            });
+            
+            // Validate full name
+            const fullName = document.getElementById('fullName').value.trim();
+            if (fullName.length < 2) {
+                showError('fullNameError', 'Le nom complet doit contenir au moins 2 caractères');
+                isValid = false;
+            }
+            
+            // Validate email
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('emailError', 'Veuillez entrer une adresse e-mail valide');
+                isValid = false;
+            }
+            
+            // Validate password
+            const password = document.getElementById('password').value;
+            if (password.length < 8) {
+                showError('passwordError', 'Le mot de passe doit contenir au moins 8 caractères');
+                isValid = false;
+            }
+            
+            // Validate password confirmation
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (password !== confirmPassword) {
+                showError('confirmPasswordError', 'Les mots de passe ne correspondent pas');
+                isValid = false;
+            }
+            
+            return {isValid, fullName, email, password};
+        }
+
+        // Validation des mots de passe en temps réel
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                showError('confirmPasswordError', 'Les mots de passe ne correspondent pas');
+            } else {
+                document.getElementById('confirmPasswordError').style.display = 'none';
+            }
+        });
+
+        //Gestion du message d'erreur
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        //Soumission du formulaire
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const validation = validateForm()
+            
+            if (validation.isValid) {
+                SignupUser(validation.fullName, validation.email, validation.password);
+                // Reset form
+                this.reset();
+            }
+        });
+
+        async function SignupUser(fullName, email, password) {
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({fullName, email, password }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Inscription réussie !');
+                    // Par exemple, rediriger vers la page chatbot
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Erreur: ' + data.message);
+                }
+            } catch (error) {
+                console.error(`Erreur lors de l/'inscription: `, error);
+            }
+        }
+
+
+    </script>
+</body>
+</html>

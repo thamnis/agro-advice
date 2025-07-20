@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroAdvice</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/src/output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="min-h-screen bg-white smooth-scroll">
+    <!-- Navigation fixe -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+
+                <div class="w-22 h-22 mx-auto bg-gradient-primary rounded-full flex items-center justify-center shadow-custom">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center">
+                        <span class="text-4l text-green-600">
+                            <i class="fas fa-seedling text-white"></i>
+                        </span>
+                    </div>
+                </div>
+
+
+                    <span class="ml-3 text-xl font-bold text-green-800">AgroAdvice</span>
+                </div>
+                
+                <!-- Menu desktop -->
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="scrollToSection('accueil')" class="nav-link capitalize transition-colors duration-200 text-gray-700 hover:text-green-600" data-section="accueil">
+                        Accueil
+                    </button>
+                    <button onclick="scrollToSection('apropos')" class="nav-link capitalize transition-colors duration-200 text-gray-700 hover:text-green-600" data-section="apropos">
+                        À propos
+                    </button>
+                    <button onclick="scrollToSection('services')" class="nav-link capitalize transition-colors duration-200 text-gray-700 hover:text-green-600" data-section="services">
+                        Services
+                    </button>
+                    <button onclick="scrollToSection('contact')" class="nav-link capitalize transition-colors duration-200 text-gray-700 hover:text-green-600" data-section="contact">
+                        Contact
+                    </button>
+                </div>
+                
+                <!-- Bouton hamburger -->
+                <div class="md:hidden">
+                    <button id="hamburger" class="hamburger" onclick="toggleMobileMenu()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Menu mobile overlay -->
+        <div id="mobile-menu-overlay" class="mobile-menu-overlay fixed inset-0 bg-black bg-opacity-50 z-40" onclick="closeMobileMenu()"></div>
+        
+        <!-- Menu mobile -->
+        <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 w-80 h-full bg-white shadow-2xl z-50 md:hidden">
+            <div class="flex flex-col h-full">
+                <!-- Header du menu mobile -->
+                <div class="flex items-center justify-between p-4 border-b">
+                    <div class="flex items-center">
+                        <div class="bg-green-600 w-8 h-8 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">A</span>
+                        </div>
+                        <span class="ml-3 text-lg font-bold text-green-800">AgroAdvice</span>
+                    </div>
+                    <button onclick="closeMobileMenu()" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Liens de navigation mobile -->
+                <nav class="flex-1 px-4 py-6">
+                    <div class="space-y-4">
+                        <button onclick="scrollToSectionAndClose('accueil')" class="mobile-nav-link w-full text-left py-3 px-4 rounded-lg transition-colors duration-200 text-gray-700 hover:bg-green-50 hover:text-green-600" data-section="accueil">
+                            <span class="ml-3 text-base font-medium">Accueil</span>
+                        </button>
+                        <button onclick="scrollToSectionAndClose('apropos')" class="mobile-nav-link w-full text-left py-3 px-4 rounded-lg transition-colors duration-200 text-gray-700 hover:bg-green-50 hover:text-green-600" data-section="apropos">
+                            <span class="ml-3 text-base font-medium">À propos</span>
+                        </button>
+                        <button onclick="scrollToSectionAndClose('services')" class="mobile-nav-link w-full text-left py-3 px-4 rounded-lg transition-colors duration-200 text-gray-700 hover:bg-green-50 hover:text-green-600" data-section="services">
+                            <span class="ml-3 text-base font-medium">Services</span>
+                        </button>
+                        <button onclick="scrollToSectionAndClose('contact')" class="mobile-nav-link w-full text-left py-3 px-4 rounded-lg transition-colors duration-200 text-gray-700 hover:bg-green-50 hover:text-green-600" data-section="contact">
+                            <span class="ml-3 text-base font-medium">Contact</span>
+                        </button>
+                    </div>
+                </nav>
+                
+                <!-- Footer du menu mobile -->
+                <div class="p-4 border-t">
+                    <p class="text-sm text-gray-500 text-center">
+                        © <span id="mobile-current-year"></span> AgroAdvice
+                    </p>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section Accueil -->
+    <section id="accueil" class="relative min-h-screen flex items-center justify-center bg-gradient-hero overflow-hidden">
+        <!-- Animations de fond -->
+        <div class="absolute inset-0">
+            <div class="absolute top-20 left-10 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-bounce-1"></div>
+            <div class="absolute top-40 right-20 w-24 h-24 bg-green-300 rounded-full opacity-30 animate-pulse-1"></div>
+            <div class="absolute bottom-32 left-1/4 w-20 h-20 bg-green-400 rounded-full opacity-25 animate-bounce-2"></div>
+            <div class="absolute top-1/3 right-1/3 w-16 h-16 bg-green-500 rounded-full opacity-20 animate-pulse-2"></div>
+        </div>
+        
+        <div class="relative z-10 text-center max-w-4xl mx-auto px-4">
+            <div class="mb-8 transform hover-scale transition-all duration-300">
+                <div class="w-32 h-32 mx-auto bg-gradient-primary rounded-full flex items-center justify-center shadow-custom animate-pulse">
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center">
+                        <span class="text-3xl text-green-600">
+                            <i class="fas fa-seedling"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                Révolutionnez votre
+                <span class="text-green-600 block">Agriculture</span>
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+                Découvrez AgroAdvice, votre assistant intelligent spécialisé dans les conseils et les bonnes pratiques agricoles conformes aux normes internationales.
+            </p>
+            
+            <button class="bg-gradient-primary text-white px-8 py-4 rounded-full text-lg font-semibold hover-scale transition-all duration-300 shadow-lg hover:shadow-xl">
+                <a href="signup.html" id="cta">Découvrir AgroAdvice</a>
+            </button>
+        </div>
+    </section>
+
+    <!-- Section À propos -->
+    <section id="apropos" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold text-gray-900 mb-6">À propos d'AgroAdvice</h2>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        AgroAdvice est une solution technologique innovante qui combine l'intelligence artificielle et l'expertise agricole pour accompagner les agriculteurs dans leurs décisions quotidiennes.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        Notre chatbot expert analyse vos besoins spécifiques et vous propose des conseils personnalisés, basés sur les meilleures pratiques agricoles modernes et alignés sur les exigences du référentiel GlobalGAP. <br>
+                        Notre objectif : démocratiser l’accès à la certification qualité, même pour les petits exploitants.                    
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white text-sm">✓</span>
+                            </div>
+                            <span class="text-gray-700">Conseils personnalisés 24/7</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white text-sm">✓</span>
+                            </div>
+                            <span class="text-gray-700">Base de données agricole complète</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white text-sm">✓</span>
+                            </div>
+                            <span class="text-gray-700">Interface intuitive et accessible</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="bg-gradient-about rounded-2xl p-8 hover-rotate transition-all duration-300">
+                        <div class="bg-white rounded-xl p-6 shadow-lg">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-xl">
+                                        <i class="fas fa-robot"></i>
+                                    </span>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="font-semibold text-gray-900">AgroAdvice Assistant</h3>
+                                    <p class="text-sm text-gray-500">En ligne</p>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="bg-gray-100 rounded-lg p-3">
+                                    <p class="text-sm text-gray-700">Bonjour ! Comment puis-je vous aider avec vos cultures aujourd'hui ?</p>
+                                </div>
+                                <div class="bg-green-500 text-white rounded-lg p-3 ml-8">
+                                    <p class="text-sm">Je cultive la tomate, des conseils ?</p>
+                                </div>
+                                <div class="bg-gray-100 rounded-lg p-3">
+                                    <p class="text-sm text-gray-700">Pour la tomate, pense à espacer tes plants de 75 x 40 cm et arrose 2 fois par semaine sans excès. Tu veux aussi un plan de fertilisation ?
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Services -->
+    <section id="services" class="py-20 bg-gradient-services">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Nos Services</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Découvrez comment AgroAdvice peut transformer votre approche de l'agriculture
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover-translate">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <span class="text-3xl text-green-600">
+                            <i class="fas fa-leaf"></i>
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4 text-center">Conseils Culturaux</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Obtenez des recommandations personnalisées pour vos cultures, basées sur le référentiel GlobalGAP.
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover-translate">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <span class="text-3xl text-indigo-600">
+                            <i class="fas fa-clipboard-list"></i>
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4 text-center">Suivi intelligent des pratiques agricoles</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Enregistrez et suivez vos opérations agricoles grâce à un système de suivi digital simple et accessible, pour garantir la conformité et améliorer vos rendements.                    
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover-translate">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <span class="text-3xl text-green-600">
+                            <i class="fas fa-file-contract"></i>
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4 text-center">Assistance à la préparation à la certification</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Préparez sereinement vos audits GlobalGAP avec un assistant digital qui vous accompagne dans la collecte des documents, la mise en place des procédures et le respect des exigences réglementaires.                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Contact -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Contactez-nous</h2>
+                <p class="text-xl text-gray-600">
+                    Prêt à révolutionner votre agriculture ? Parlons-en !
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-6">Informations de contact</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                <span class="text-green-600 text-xl">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Email</p>
+                                <p class="text-gray-600">contact@agroadvice.com</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                <span class="text-green-600 text-xl">
+                                    <i class="fas fa-phone"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Téléphone</p>
+                                <p class="text-gray-600">+225 0141697882</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                <span class="text-green-600 text-xl">
+                                    <i class="fas fa-location-dot"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Adresse</p>
+                                <p class="text-gray-600">Abidjan, Côte d'Ivoire</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-6">Envoyez-nous un message</h3>
+                    <form class="space-y-6 max-w-md mx-auto" onsubmit="handleSubmit(event)">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">Nom</label>
+                            <input type="text" id="name" name="name" required class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50" />
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="email" name="email" required class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50" />
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+                            <textarea id="message" name="message" rows="4" required style="resize: none;" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"></textarea>
+                        </div>
+                        <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-700 transition-colors duration-300 w-full">
+                            Envoyer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-green-600 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <span class="text-xl font-bold">AgroAdvice</span>
+                </div>
+                <div class="space-x-6">
+                    <button onclick="scrollToSection('accueil')" class="capitalize hover:underline">
+                        Accueil
+                    </button>
+                    <button onclick="scrollToSection('apropos')" class="capitalize hover:underline">
+                        À propos
+                    </button>
+                    <button onclick="scrollToSection('services')" class="capitalize hover:underline">
+                        Services
+                    </button>
+                    <button onclick="scrollToSection('contact')" class="capitalize hover:underline">
+                        Contact
+                    </button>
+                </div>
+                <div class="mt-4 md:mt-0 text-sm">
+                    © <span id="current-year"></span> AgroAdvice. Tous droits réservés.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

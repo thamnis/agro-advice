@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroAdvice - Connexion</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="logo">AgroAdvice</h1>
+        <p class="subtitle">Connectez-vous à votre assistant agricole</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Adresse e-mail <span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="exemple@gmail.com">
+                <div class="error-message" id="emailError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe <span class="required">*</span></label>
+                <div class="input-container">
+                    <input type="password" id="password" name="password">
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
+                </div>
+                <div class="error-message" id="passwordError"></div>
+            </div>
+            
+            <button type="submit" class="login-btn">Se connecter</button>
+        </form>
+        
+        <p class="signup-link">
+            Pas encore de compte ? <a href="signup.html">Créer un compte</a>
+        </p>
+    </div>
+
+    <script>0
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.password-toggle');
+        
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁';
+            }
+        }
+
+
+        // Affiche le message d’erreur
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function validateLoginForm() {
+            let isValid = true;
+        
+            // Nettoyer les erreurs précédentes
+            document.querySelectorAll('.error-message').forEach(msg => {
+                msg.style.display = 'none';
+                msg.textContent = '';
+            });
+        
+            // Récupérer les valeurs à chaque validation
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+        
+            // Vérifie l'e-mail
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('emailError', 'Veuillez entrer une adresse e-mail valide');
+                isValid = false;
+            }
+        
+            // Vérifie le mot de passe
+            if (password.length === 0) {
+                showError('passwordError', 'Veuillez entrer votre mot de passe');
+                isValid = false;
+            }
+        
+            return { isValid, email, password };
+        }
+
+        // Gestion de la soumission du formulaire
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+        
+            const validation = validateLoginForm();
+        
+            if (validation.isValid) {
+                loginUser(validation.email, validation.password);
+            }
+        });
+
+
+
+
+        async function loginUser(email, password) {
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    // alert('Connexion réussie !');
+                    // Par exemple, rediriger vers la page chatbot
+                    window.location.href = '/dashboard.html';
+                } else {
+                    alert('Erreur: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Erreur lors de la connexion:', error);
+            }
+        }
+
+    </script>
+</body>
+</html>
